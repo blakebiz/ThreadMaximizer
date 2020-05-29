@@ -28,14 +28,8 @@ def gen_tests(count, mn, mx, tp=float):
         
 
 def order_tasks(tasks,workers):
-    tasks= list(itertools.permutations(tasks));best_tasks_ = tasks[0]
-    def order_tasks_(tasks_, workers_):
-        time = 0
-        while tasks_ != []:
-            time, tasks_ = time + [round(1 if min(tasks_[:workers_]) > 1 else min(tasks_[:workers_]), 2) for i, val in enumerate(tasks_)][0], [round(val - (1 if min(tasks_[:workers_]) > 1 else min(tasks_[:workers_])), 2) if i < workers_ and val > 0 else round(val, 2) for i, val in enumerate(tasks_)];tasks_ = list(filter(lambda x: x > 0, tasks_))
-        return round(time, 2)
-    best_tasks_ = [x if order_tasks_(x,workers)<order_tasks_(best_tasks_,workers) else best_tasks_ for x in tasks[1:]][0]
-    return [order_tasks_(best_tasks_,workers),best_tasks_,workers]
+    # PUT YOUR FUNCTION HERE
+    pass
 
 
 def test_case(test, tot1, tot2, p, f, threaded=True):
