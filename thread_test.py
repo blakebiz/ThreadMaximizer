@@ -61,6 +61,8 @@ def test_case(test, tot1, tot2, p, f, threaded=True):
         print(f'tasks: {test[0]}, workers: {test[1]}\nuser result: {testing}, biz result: {valid}, workers: {test[1]}\n')
 
 def test_main():
+    # Change the 10 to however many cases you want to generate
+    # the 3 is the minimum amount of tasks and the 7 is the maximum amount (don't set the max very high)
     test_cases = gen_tests(10, 3, 7)
 
     tot1, tot2, p, f = Storage(), Storage(), Storage(), Storage()
