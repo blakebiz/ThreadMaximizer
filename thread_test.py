@@ -28,16 +28,11 @@ def gen_tests(count, mn, mx, tp=float):
         
 
 def order_tasks(tasks,workers):
-    tasks= list(itertools.permutations(tasks));best_tasks_ = tasks[0]
-    def order_tasks_(tasks_, workers_):
-        time = 0
-        while tasks_ != []:
-            time, tasks_ = time + [round(1 if min(tasks_[:workers_]) > 1 else min(tasks_[:workers_]), 2) for i, val in enumerate(tasks_)][0], [round(val - (1 if min(tasks_[:workers_]) > 1 else min(tasks_[:workers_])), 2) if i < workers_ and val > 0 else round(val, 2) for i, val in enumerate(tasks_)];tasks_ = list(filter(lambda x: x > 0, tasks_))
-        return round(time, 2)
-    best_tasks_ = [x if order_tasks_(x,workers)<order_tasks_(best_tasks_,workers) else best_tasks_ for x in tasks[1:]][0]
-    return [order_tasks_(best_tasks_,workers),best_tasks_,workers]
+    # PUT YOUR FUNCTION HERE TO TEST AGAINST MINE
+    pass
 
-def test_case(test, tot1, tot2, p, f):
+
+def test_case(test, tot1, tot2, p, f, threaded=True):
     start1 = time.time()
     testing = order_tasks(test[0].copy(), test[1])
     end1 = time.time() - start1
@@ -46,8 +41,6 @@ def test_case(test, tot1, tot2, p, f):
     end2 = time.time() - start2
     tot1.n += end1
     tot2.n += end2
-    # print(f'input: {test}')
-    # print(str(valid) + '\n')
     if round(testing[0], 1) == round(valid.best, 1):
         if round(simulate_threads(list(testing[1]).copy(), testing[2])[0], 1) == round(testing[0], 1):
             p.n += 1
@@ -66,12 +59,18 @@ def test_main():
 
     tot1, tot2, p, f = Storage(), Storage(), Storage(), Storage()
     threads = []
-    for test in test_cases:
-        thread = threading.Thread(target=test_case, args=(test, tot1, tot2, p, f))
-        thread.start()
-        threads.append(thread)
-    for thread in threads:
-        thread.join()
+    # CHANGE THREADED TO FALSE TO RUN ON ONE THREAD
+    threaded = True
+    if threaded:
+        for test in test_cases:
+            thread = threading.Thread(target=test_case, args=(test, tot1, tot2, p, f, 10))
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
+    else:
+        for test in test_cases:
+            test_case(test, tot1, tot2, p, f, threaded=1)
     print(f'user passed: {p}, user failed: {f}')
     print(f'user run time: {tot1}')
     print(f'Biz run time: {tot2}')

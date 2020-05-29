@@ -127,9 +127,9 @@ def testFuncsGen(count, funcs, store, grouping=1, condensed=True):
 def run_tests(count, funcs, thread_limit=1, time_limit=None, workers=None):
     store = BestTime(workers)
     threads = testFuncsGen(count, funcs, store)
-    # limit_threads(thread_limit, threads, time_limit=time_limit, interval=0)
-    for thread in threads:
-        thread.start()
+    limit_threads(thread_limit, threads, time_limit=time_limit, interval=0)
+    # for thread in threads:
+    #     thread.start()
     return store
 
 def get_tests(threads, limit):
