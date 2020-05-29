@@ -2,14 +2,15 @@ import time, threading
 from itertools import permutations
 
 class BestTime:
-    def __init__(self):
+    def __init__(self, workers):
         self.best = None
         self.order = []
         self.index = 0
         self.length = 0
+        self.workers = workers
 
     def __str__(self):
-        return f'time: {self.best}, order: {self.order}'
+        return f'time: {round(self.best, 2)}, order: {self.order}, workers: {self.workers}'
 
     def store(self, best, order):
         self.length += 1
@@ -32,15 +33,13 @@ def timer(f, store=None):
         return best, order
     return wrapper
 
-def simulate_threads(threads, limit, reverse=True):
+def simulate_threads(threads, limit):
     thrds = threads.copy()
-    if not reverse:
-        threads.reverse()
     running = []
     timer = 0
-    while threads:
-        if len(running) < limit:
-            running.append(threads.pop())
+    while threads or running:
+        if len(running) < limit and threads:
+            running.append(threads.pop(0))
         else:
             low = min(running)
             ind = 0
@@ -51,17 +50,6 @@ def simulate_threads(threads, limit, reverse=True):
                 else:
                     running[ind] -= low
                     ind += 1
-
-    while running:
-        low = min(running)
-        ind = 0
-        for _ in range(len(running)):
-            if running[ind] == low:
-                running.pop(ind)
-            else:
-                running[ind] -= low
-                ind += 1
-        timer += low
     return timer, thrds
 
 def limit_threads(limit, threads, reverse=True, interval=.1, time_limit=None):
@@ -105,7 +93,7 @@ def limit_threads(limit, threads, reverse=True, interval=.1, time_limit=None):
     for thrd in running:
         thrd.join()
 
-def testFuncsGen(count, funcs, store, grouping=100000, condensed=True):
+def testFuncsGen(count, funcs, store, grouping=1, condensed=True):
     '''
     :param count:
     The amount of times each function is to be ran
@@ -136,8 +124,8 @@ def testFuncsGen(count, funcs, store, grouping=100000, condensed=True):
             for i in range(count):
                 yield threading.Thread(target=timer(func, store=store))
 
-def run_tests(count, funcs, thread_limit=1, time_limit=None):
-    store = BestTime()
+def run_tests(count, funcs, thread_limit=1, time_limit=None, workers=None):
+    store = BestTime(workers)
     threads = testFuncsGen(count, funcs, store)
     # limit_threads(thread_limit, threads, time_limit=time_limit, interval=0)
     for thread in threads:
@@ -166,8 +154,8 @@ def order_threads(gThreads, limit, thread_count=1, time_limit=None):
     A tuple of the best order to run your threads in for fastest run time
     """
 
-    store = run_tests(1, get_tests(gThreads, limit), thread_limit=thread_count, time_limit=time_limit)
-    print(f'Choice was index {store.index} of {store.length}')
+    store = run_tests(1, get_tests(gThreads, limit), thread_limit=thread_count, time_limit=time_limit, workers=limit)
+    # print(f'Choice was index {store.index} of {store.length}')
     return store
 
 def wrap(func, arg1, arg2):
@@ -211,8 +199,8 @@ def main(tc=1):
     # print(order)
 
     start = time.time()
-    print(order_threads([22, 6, 2, 12, 4, 8, 6, 14, 8], 2, thread_count=tc))
+    print(order_threads([22, 6, 2, 12, 4, 8, 6, 14, 8, 3, 5, 2], 2, thread_count=tc))
     print(f'Run time: {time.time()-start}')
 
 if __name__ == '__main__':
-    main(10000000)
+    main(1000000000)
