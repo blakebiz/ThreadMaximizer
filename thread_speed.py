@@ -73,23 +73,27 @@ def limit_threads(limit, threads, reverse=True, interval=.1, time_limit=None):
         threads.reverse()
     running = []
     count = 0
-    while threads:
-        ind = 0
-        for _ in range(len(running)):
-            if not running[ind].is_alive():
-                running.pop(ind)
-            else:
-                ind += 1
-        if len(running) < limit:
-            thread = threads.__next__()
-            thread.start()
-            running.append(thread)
-        if count >= limit:
-            time.sleep(interval)
-        count += 1
-        if time_limit is not None:
-            if (time.time() - start) > time_limit:
-                break
+    rning = True
+    while rning:
+        try:
+            ind = 0
+            for _ in range(len(running)):
+                if not running[ind].is_alive():
+                    running.pop(ind)
+                else:
+                    ind += 1
+            if len(running) < limit:
+                thread = threads.__next__()
+                thread.start()
+                running.append(thread)
+            if count >= limit:
+                time.sleep(interval)
+            count += 1
+            if time_limit is not None:
+                if (time.time() - start) > time_limit:
+                    break
+        except StopIteration:
+            rning = False
     for thrd in running:
         thrd.join()
 
